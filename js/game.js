@@ -9,6 +9,7 @@ var stoppers;
 var npcs;
 var rc;
 var spaceKey;
+var greg;
 
 function preload() {
     // preload content
@@ -25,10 +26,10 @@ function create() {
     game.world.setBounds(0, 0, 1920, 1920);
     game.physics.arcade.gravity.y = 600;
 
-    var text = game.add.text(32, 32, 'GREG IS HAPPY', {fontSize:'64px', fill: '#000'});
-    text.anchor.set(0.5);
-    text.x = game.width / 2;
-    text.y = game.height / 4;
+    greg = game.add.text(32, 32, 'GREG IS HAPPY', {fontSize:'64px', fill: '#000'});
+    greg.anchor.set(0.5);
+    greg.x = game.width / 2;
+    greg.y = game.height / 4;
 
     map = game.add.tilemap('map');
     map.addTilesetImage('tileset', 'tilesheet');
@@ -77,6 +78,20 @@ function update() {
     });
     
     rc.level = total;
+
+    if (total < 25) {
+        greg.text = "GREG IS FURIOUS!";
+        // greg is angry!
+    } else if (total < 50) {
+        greg.text = "GREG IS PULSATING!"; 
+        // greg is displeased!
+    } else if (total < 80) {
+        greg.text = "GREG IS ANGRY!";
+        // greg needs a chill pill;
+    } else if (total < 100) {
+        greg.text = "GREG IS PLEASED!";
+        // greg is getting ANGRY!
+    } 
 }
 
 function npcOverlap(npc1, npc2) {
@@ -156,7 +171,7 @@ NPC.prototype.contstructor = NPC;
 NPC.prototype.update = function() {
     // anger management
     if (this.anger < 9) { 
-        this.anger += (game.time.physicsElapsed * this.modifier);
+        this.anger += (game.time.physicsElapsed * this.modifier) * 0.5;
     }
 
     this.frame = Math.round(this.anger);
