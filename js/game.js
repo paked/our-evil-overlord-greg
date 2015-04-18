@@ -5,6 +5,7 @@ var map;
 var ladderMap;
 var platforms;
 var ladders;
+var stoppers;
 var npcs;
 
 function preload() {
@@ -30,27 +31,41 @@ function create() {
     map = game.add.tilemap('map');
     map.addTilesetImage('tileset', 'tilesheet');
     map.setCollisionBetween(1, 4);
+
     platforms = map.createLayer('Platforms'); 
     ladders = map.createLayer('Ladders');
-
-    player = new Player();
-    game.add.existing(player);
-    game.camera.follow(player);
+    stoppers = map.createLayer('Stoppers');
 
     cursors = game.input.keyboard.createCursorKeys();
 
     npcs = game.add.group();
     npcs.enableBody = true;
-
+    var max = 5;
+    var total = 0;
     var tiles = platforms.getTiles(0, 0, platforms.width, platforms.height);
     for (var i in tiles) {
+        if (total >= max) {
+            break;
+        }
+
+        if (i % 10 === 0) {
+            total = 0;
+        }
+
         var tile = tiles[i];
-        if (tile.index != -1 && Math.random() > 0.9) {
+        if (tile.index == 3 && Math.random() > 0.9) {
             var npc = new NPC(tile.worldX, 0);
             npc.y = tile.worldY - npc.height;
             npcs.add(npc);
+            total += 1; 
         }
     }
+
+    player = new Player();
+    game.add.existing(player);
+    game.camera.follow(player);
+
+
 }
 
 function update() {
@@ -82,8 +97,49 @@ Player.prototype.update = function() {
 NPC = function(x, y) {
     Phaser.Sprite.call(this, game, x, y, 'NPC');
     game.physics.arcade.enable(this);
+    
+    this.body.velocity.x = 50;
+    if (Math.random() > 0.5) {
+        console.log("other direction!");
+        this.body.velocity.x *= -1;
+    }
 };
 
 NPC.prototype = Object.create(Phaser.Sprite.prototype);
 NPC.prototype.contstructor = NPC;
+
+NPC.prototype.update = function() {
+    var tileX = stoppers.getTileX(this.x + this.body.width/2);
+    var tileY = stoppers.getTileY(this.y + this.body.height/2);
+    if (this.isEdge(stoppers.index, tileX, tileY)) {
+        if (this.game.time.now - this.lastTime < 100) {
+            return;
+        }
+
+        this.body.velocity.x *= -1;
+        this.lastTime = this.game.time.now;
+        /*
+        if (this.animations.currentAnim.name == 'left') {
+            this.animations.play('right');
+            return;
+        }
+        
+        this.animations.play('left');*/
+    }
+};
+
+NPC.prototype.isEdge = function(index, x, y) {
+    var leftTile = map.getTileLeft(index, x, y);
+    var rightTile = map.getTileRight(index, x, y);
+   
+    if (!leftTile && rightTile) {
+        return rightTile.index != -1;
+    }
+
+    if (!rightTile && leftTile) {
+        return leftTile.index != -1;
+    }
+
+    return (leftTile.index != -1) || (rightTile.index != -1);
+};
 
