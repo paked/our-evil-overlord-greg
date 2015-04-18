@@ -46,23 +46,12 @@ function create() {
     var total = 0;
     var tiles = platforms.getTiles(0, 0, platforms.width, platforms.height);
     for (var i in tiles) {
-        if (total >= max) {
-            break;
-        }
-
-        if (i % 10 === 0) {
-            total = 0;
-        }
-
         var tile = tiles[i];
         if (tile.index == 3 && Math.random() > 0.9) {
             npc = new NPC(tile.worldX, 0);
             npc.y = tile.worldY - npc.height;
             npcs.add(npc);
             total += 1; 
-            if (total == 2) {
-                break;
-            }
          }
     }
 
@@ -139,6 +128,8 @@ NPC = function(x, y) {
     if (Math.random() > 0.5) {
         this.body.velocity.x *= -1;
     }
+
+    this.modifier = Math.random() / 2 + 0.1;
 };
 
 NPC.prototype = Object.create(Phaser.Sprite.prototype);
@@ -147,7 +138,7 @@ NPC.prototype.contstructor = NPC;
 NPC.prototype.update = function() {
     // anger management
     if (this.anger < 9) { 
-        this.anger += game.time.physicsElapsed;
+        this.anger += (game.time.physicsElapsed * this.modifier);
     }
 
     this.frame = Math.round(this.anger);
