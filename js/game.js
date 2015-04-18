@@ -5,11 +5,13 @@ var map;
 var ladderMap;
 var platforms;
 var ladders;
+var npcs;
 
 function preload() {
     // preload content
     game.load.image('tilesheet', 'assets/tileset.png');
     game.load.image('player', 'assets/player.png');
+    game.load.image('NPC', 'assets/NPC.png');
     game.load.tilemap('map', 'assets/maps/level.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -27,7 +29,7 @@ function create() {
 
     map = game.add.tilemap('map');
     map.addTilesetImage('tileset', 'tilesheet');
-    map.setCollisionBetween(1, 7);
+    map.setCollisionBetween(1, 4);
     platforms = map.createLayer('Platforms'); 
     ladders = map.createLayer('Ladders');
 
@@ -36,10 +38,24 @@ function create() {
     game.camera.follow(player);
 
     cursors = game.input.keyboard.createCursorKeys();
+
+    npcs = game.add.group();
+    npcs.enableBody = true;
+
+    var tiles = platforms.getTiles(0, 0, platforms.width, platforms.height);
+    for (var i in tiles) {
+        var tile = tiles[i];
+        if (tile.index != -1 && Math.random() > 0.9) {
+            var npc = new NPC(tile.worldX, 0);
+            npc.y = tile.worldY - npc.height;
+            npcs.add(npc);
+        }
+    }
 }
 
 function update() {
     game.physics.arcade.collide(player, platforms); 
+    game.physics.arcade.collide(npcs, platforms);
 }
 
 Player = function() {
@@ -62,4 +78,12 @@ Player.prototype.update = function() {
         this.body.velocity.y = -300;
     }
 };
+
+NPC = function(x, y) {
+    Phaser.Sprite.call(this, game, x, y, 'NPC');
+    game.physics.arcade.enable(this);
+};
+
+NPC.prototype = Object.create(Phaser.Sprite.prototype);
+NPC.prototype.contstructor = NPC;
 
