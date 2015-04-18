@@ -35,6 +35,7 @@ function create() {
     platforms = map.createLayer('Platforms'); 
     ladders = map.createLayer('Ladders');
     stoppers = map.createLayer('Stoppers');
+    stoppers.visible = false;
 
     cursors = game.input.keyboard.createCursorKeys();
 
@@ -64,8 +65,6 @@ function create() {
     player = new Player();
     game.add.existing(player);
     game.camera.follow(player);
-
-
 }
 
 function update() {
@@ -103,6 +102,7 @@ NPC = function(x, y) {
         console.log("other direction!");
         this.body.velocity.x *= -1;
     }
+
 };
 
 NPC.prototype = Object.create(Phaser.Sprite.prototype);
