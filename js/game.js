@@ -7,6 +7,7 @@ var platforms;
 var ladders;
 var stoppers;
 var npcs;
+var rc;
 
 function preload() {
     // preload content
@@ -68,14 +69,22 @@ function create() {
     player = new Player();
     game.add.existing(player);
     game.camera.follow(player);
+
+    rc = new RageCounter();
+    game.add.existing(rc);
 }
 
 function update() {
     game.physics.arcade.collide(player, platforms); 
     game.physics.arcade.collide(npcs, platforms); 
+
+    var total = 0;
     npcs.forEach(function(npc) {
+        total += npc.anger;
         game.physics.arcade.overlap(npc, npcs, npcOverlap);
     });
+    
+    rc.level = total;
 }
 
 function npcOverlap(npc1, npc2) {
@@ -184,12 +193,24 @@ NPC.prototype.isEdge = function(index, x, y) {
 NPC.prototype.rageAt = function(otherNPC) {
     // TODO - implement different levels of rage
     if (this.game.time.now - this.lastRaged < 1000) {
-        console.log("no rage");
         return;
     }
 
     otherNPC.anger *= 1.5;
     console.log("RAAAGE");
     this.lastRaged = otherNPC.lastRaged = this.game.time.now;
+};
+
+RageCounter = function() {
+    Phaser.Text.call(this, game, 0, 0, "RAGE LEVEL: ", {});
+    this.level = 0;
+    this.fixedToCamera = true;
+};
+
+RageCounter.prototype = Object.create(Phaser.Text.prototype);
+RageCounter.prototype.contstructor = RageCounter; 
+
+RageCounter.prototype.update = function() {
+    this.text = "RAGE LEVEL: " + Math.round(this.level);
 };
 
