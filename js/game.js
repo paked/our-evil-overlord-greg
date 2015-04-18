@@ -92,9 +92,7 @@ function npcOverlap(npc1, npc2) {
         victim = npc1;
     }
     // higher anger, higher chance of rage
-    // 1 - 0.9 / 7
-    var chance = (rager.anger * 0.05);
-    console.log(chance, "<- chance");
+    var chance = (rager.anger * 0.05) - 0.3;
     if (Math.random() >= chance) {
         rager.rageAt(victim);
     }
@@ -124,13 +122,14 @@ Player.prototype.update = function() {
 NPC = function(x, y) {
     Phaser.Sprite.call(this, game, x, y, 'NPC');
     game.physics.arcade.enable(this);
-    
+     
+    this.lastRaged = this.game.time.now - 100;
+    this.anger = 0;
+
     this.body.velocity.x = 50;
     if (Math.random() > 0.5) {
         this.body.velocity.x *= -1;
     }
-    
-    this.anger = 0;
 };
 
 NPC.prototype = Object.create(Phaser.Sprite.prototype);
@@ -184,9 +183,13 @@ NPC.prototype.isEdge = function(index, x, y) {
 
 NPC.prototype.rageAt = function(otherNPC) {
     // TODO - implement different levels of rage
-    console.log(otherNPC.anger);
+    if (this.game.time.now - this.lastRaged < 1000) {
+        console.log("no rage");
+        return;
+    }
+
     otherNPC.anger *= 1.5;
-    console.log(otherNPC.anger, "<- new rage");
-    console.log("raged");
+    console.log("RAAAGE");
+    this.lastRaged = otherNPC.lastRaged = this.game.time.now;
 };
 
