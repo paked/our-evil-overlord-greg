@@ -110,6 +110,8 @@ function playerNPCOverlap(player, npc) {
 Player = function() {
     Phaser.Sprite.call(this, game, 0, 0, 'player');
     game.physics.arcade.enable(this);
+    
+    this.x = (game.width - this.width) / 2;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
