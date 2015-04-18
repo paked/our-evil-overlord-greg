@@ -11,6 +11,7 @@ var npcs;
 var rc;
 var spaceKey;
 var greg;
+var messages;
 
 function preload() {
     // preload content
@@ -86,6 +87,18 @@ function create() {
 
     rc = new RageCounter();
     game.add.existing(rc);
+
+    messages = game.add.group();
+    for (i = 0; i < 20; i++) {
+        var message = new Message();
+        message.kill();
+        messages.add(message);
+    }
+}
+
+function sendMessage(text) {
+    var message = messages.getFirstDead();
+    message.go(text);
 }
 
 function update() {
@@ -143,7 +156,7 @@ function playerNPCOverlap(player, npc) {
     if (!spaceKey.isDown) {
         return;
     }
-//    npc.anger = 0;  
+    
     player.beNiceTo(npc);
 }
 
@@ -184,11 +197,13 @@ Player.prototype.beNiceTo = function(npc) {
     }
 
     npc.anger = 0;
-    this.nice -= 1;  
+    this.nice -= 1;
+    sendMessage("Hmm you are nice!");
 };
 
 Player.prototype.giveNiceness = function() {
     this.nice += 1; 
+    sendMessage("I love a bit of niceness");
 };
 
 NPC = function(x, y) {
@@ -263,6 +278,7 @@ NPC.prototype.rageAt = function(otherNPC) {
 
     otherNPC.anger *= 1.5;
     this.lastRaged = otherNPC.lastRaged = this.game.time.now;
+    sendMessage("*punch* *slam*");
 };
 
 RageCounter = function() {
@@ -301,3 +317,29 @@ Star.prototype.comeback = function() {
     this.x += modX;
     this.exists = true;
 };
+
+Message = function() {
+    Phaser.Text.call(this, game, 0, 0, "RAGE LEVEL: ", {});
+    game.physics.arcade.enable(this);
+    this.anchor.setTo(0.5, 0.5);
+};
+
+Message.prototype = Object.create(Phaser.Text.prototype);
+Message.prototype.constructor = Message;
+
+Message.prototype.go = function(text) {
+    this.text = text;
+    this.y = 0;
+    this.x = (game.width - this.width) / 2;
+    this.body.velocity.y = 50;
+    this.alive = true;
+    this.exists = true;
+    this.visible = true;
+};
+
+Message.prototype.update = function() {
+    if (this.y >= game.height) {
+        this.kill();
+    }
+};
+
