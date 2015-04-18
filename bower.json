@@ -1,0 +1,13 @@
+{
+  "name": "our-evil-overlord-greg",
+  "version": "0.0.0",
+  "homepage": "https://github.com/paked/our-evil-overlord-greg",
+  "authors": [
+    "Harrison <harrison@theshoebridges.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "phaser": "~2.3.0"
+  }
+}
