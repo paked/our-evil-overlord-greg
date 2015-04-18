@@ -55,14 +55,14 @@ function create() {
 
         var tile = tiles[i];
         if (tile.index == 3 && Math.random() > 0.9) {
-            var npc = new NPC(tile.worldX, 0);
+            npc = new NPC(tile.worldX, 0);
             npc.y = tile.worldY - npc.height;
             npcs.add(npc);
             total += 1; 
             if (total == 2) {
                 break;
             }
-        }
+         }
     }
 
     player = new Player();
@@ -133,9 +133,13 @@ NPC.prototype.contstructor = NPC;
 
 NPC.prototype.update = function() {
     // anger management
-    this.anger += game.time.elapsed / 1000;
+    if (this.anger < 9) { 
+        this.anger += game.time.physicsElapsed;
+    }
+
     this.frame = Math.round(this.anger);
-    if (this.frame > 9 ) {
+    if (Math.round(this.anger) > 9) {
+        console.log("reset frame");
         this.frame = 9;
     }
 
@@ -176,7 +180,9 @@ NPC.prototype.isEdge = function(index, x, y) {
 
 NPC.prototype.rageAt = function(otherNPC) {
     // TODO - implement different levels of rage
+    console.log(otherNPC.anger);
     otherNPC.anger *= 1.5;
+    console.log(otherNPC.anger, "<- new rage");
     console.log("raged");
 };
 
