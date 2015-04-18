@@ -1,5 +1,3 @@
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
-
 var player;
 var map;
 var ladderMap;
@@ -13,16 +11,18 @@ var spaceKey;
 var greg;
 var messages;
 
-function preload() {
+PlayState = function() {};
+
+PlayState.prototype.preload = function() {
     // preload content
     game.load.image('tilesheet', 'assets/tileset.png');
     game.load.image('star', 'assets/star.png');
     game.load.image('player', 'assets/player.png');
     game.load.spritesheet('NPC', 'assets/NPC.png', 10, 16);
     game.load.tilemap('map', 'assets/maps/level.json', null, Phaser.Tilemap.TILED_JSON);
-}
+};
 
-function create() {
+PlayState.prototype.create = function() {
     // create entities
     game.stage.backgroundColor = '#47A3FF'; 
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -30,8 +30,7 @@ function create() {
     game.physics.arcade.gravity.y = 600;
 
     greg = game.add.text(32, 32, 'GREG IS HAPPY', {fontSize:'64px', fill: '#000'});
-    greg.anchor.set(0.5);
-    greg.x = game.width / 2;
+    greg.anchor.set(0.5); greg.x = game.width / 2;
     greg.y = game.height / 4;
 
     map = game.add.tilemap('map');
@@ -94,14 +93,14 @@ function create() {
         message.kill();
         messages.add(message);
     }
-}
+};
 
 function sendMessage(text) {
     var message = messages.getFirstDead();
     message.go(text);
 }
 
-function update() {
+PlayState.prototype.update = function() {
     game.physics.arcade.collide(player, platforms); 
     game.physics.arcade.collide(npcs, platforms); 
     game.physics.arcade.collide(stars, platforms);
@@ -130,7 +129,7 @@ function update() {
         greg.text = "GREG IS PLEASED!";
         // greg is getting ANGRY!
     } 
-}
+};
 
 function npcOverlap(npc1, npc2) {
     if (npc1.renderOrderID == npc2.renderOrderID) {
@@ -342,4 +341,6 @@ Message.prototype.update = function() {
         this.kill();
     }
 };
+
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', new PlayState());
 
