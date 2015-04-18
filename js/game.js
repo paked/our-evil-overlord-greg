@@ -8,6 +8,7 @@ var ladders;
 var stoppers;
 var npcs;
 var rc;
+var spaceKey;
 
 function preload() {
     // preload content
@@ -39,6 +40,7 @@ function create() {
     stoppers.visible = false;
 
     cursors = game.input.keyboard.createCursorKeys();
+    spaceKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     npcs = game.add.group();
     npcs.enableBody = true;
@@ -71,6 +73,7 @@ function update() {
     npcs.forEach(function(npc) {
         total += npc.anger;
         game.physics.arcade.overlap(npc, npcs, npcOverlap);
+        game.physics.arcade.overlap(player, npc, playerNPCOverlap);
     });
     
     rc.level = total;
@@ -96,6 +99,14 @@ function npcOverlap(npc1, npc2) {
     }
 }
 
+function playerNPCOverlap(player, npc) {
+    if (!spaceKey.isDown) {
+        return;
+    }
+
+    npc.anger = 0;
+}
+
 Player = function() {
     Phaser.Sprite.call(this, game, 0, 0, 'player');
     game.physics.arcade.enable(this);
@@ -115,6 +126,11 @@ Player.prototype.update = function() {
     if (cursors.up.isDown && this.body.onFloor()) {
         this.body.velocity.y = -300;
     }
+};
+
+Player.prototype.beNiceTo = function(npc) {
+    // TODO - different levels of "healing"
+    npc.rage = 0;
 };
 
 NPC = function(x, y) {
