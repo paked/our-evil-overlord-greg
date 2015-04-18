@@ -11,6 +11,20 @@ var spaceKey;
 var greg;
 var messages;
 
+MenuState = function() {};
+MenuState.prototype.create = function() {
+    var text = game.add.text(0, 0, 'PRESS SPACE TO START', {fontSize: '48px', fill: '#fff'});
+    text.anchor.x = text.anchor.y = 0.5;
+    text.x = game.world.centerX;
+    text.y = game.world.centerY;
+};
+
+MenuState.prototype.update = function() {
+    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        game.state.start('PlayState');
+    }
+};
+
 PlayState = function() {};
 
 PlayState.prototype.preload = function() {
@@ -342,5 +356,7 @@ Message.prototype.update = function() {
     }
 };
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', new PlayState());
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '');
+game.state.add('PlayState', PlayState);
+game.state.add('MenuState', MenuState, true);
 
