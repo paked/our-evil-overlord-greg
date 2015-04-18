@@ -12,7 +12,7 @@ function preload() {
     // preload content
     game.load.image('tilesheet', 'assets/tileset.png');
     game.load.image('player', 'assets/player.png');
-    game.load.image('NPC', 'assets/NPC.png');
+    game.load.spritesheet('NPC', 'assets/NPC.png', 10, 16);
     game.load.tilemap('map', 'assets/maps/level.json', null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -59,6 +59,9 @@ function create() {
             npc.y = tile.worldY - npc.height;
             npcs.add(npc);
             total += 1; 
+            if (total == 2) {
+                break;
+            }
         }
     }
 
@@ -69,7 +72,27 @@ function create() {
 
 function update() {
     game.physics.arcade.collide(player, platforms); 
-    game.physics.arcade.collide(npcs, platforms);
+    game.physics.arcade.collide(npcs, platforms); 
+    npcs.forEach(function(npc) {
+        game.physics.arcade.overlap(npc, npcs, npcOverlap);
+    });
+}
+
+function npcOverlap(npc1, npc2) {
+    if (npc1.renderOrderID == npc2.renderOrderID) {
+        return;
+    }
+    
+    if (Math.random() <= 0.9) {
+        return;
+    }
+
+    if (Math.random() <= 0.5) {
+        npc1.rageAt(npc2);
+        return;
+    }
+    
+    npc2.rageAt(npc1);
 }
 
 Player = function() {
@@ -99,16 +122,24 @@ NPC = function(x, y) {
     
     this.body.velocity.x = 50;
     if (Math.random() > 0.5) {
-        console.log("other direction!");
         this.body.velocity.x *= -1;
     }
-
+    
+    this.anger = 0;
 };
 
 NPC.prototype = Object.create(Phaser.Sprite.prototype);
 NPC.prototype.contstructor = NPC;
 
 NPC.prototype.update = function() {
+    // anger management
+    this.anger += game.time.elapsed / 1000;
+    this.frame = Math.round(this.anger);
+    if (this.frame > 9 ) {
+        this.frame = 9;
+    }
+
+    // edge detection
     var tileX = stoppers.getTileX(this.x + this.body.width/2);
     var tileY = stoppers.getTileY(this.y + this.body.height/2);
     if (this.isEdge(stoppers.index, tileX, tileY)) {
@@ -141,5 +172,11 @@ NPC.prototype.isEdge = function(index, x, y) {
     }
 
     return (leftTile.index != -1) || (rightTile.index != -1);
+};
+
+NPC.prototype.rageAt = function(otherNPC) {
+    // TODO - implement different levels of rage
+    otherNPC.anger *= 1.5;
+    console.log("raged");
 };
 
