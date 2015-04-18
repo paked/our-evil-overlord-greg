@@ -143,13 +143,14 @@ function playerNPCOverlap(player, npc) {
     if (!spaceKey.isDown) {
         return;
     }
-
-    npc.anger = 0;
+//    npc.anger = 0;  
+    player.beNiceTo(npc);
 }
 
 function overlapPlayerStar(player, star) {
     console.log("overlapping");
     star.use();
+    player.giveNiceness();
 }
 
 Player = function() {
@@ -157,6 +158,7 @@ Player = function() {
     game.physics.arcade.enable(this);
     
     this.x = (game.width - this.width) / 2;
+    this.nice = 0;
 };
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -177,7 +179,16 @@ Player.prototype.update = function() {
 
 Player.prototype.beNiceTo = function(npc) {
     // TODO - different levels of "healing"
-    npc.rage = 0;
+    if (this.nice <= 0 || npc.anger < 1) {
+        return;
+    }
+
+    npc.anger = 0;
+    this.nice -= 1;  
+};
+
+Player.prototype.giveNiceness = function() {
+    this.nice += 1; 
 };
 
 NPC = function(x, y) {
@@ -278,7 +289,7 @@ Star.prototype.contstructor = Star;
 
 Star.prototype.use = function() {
     this.exists = false;
-    game.time.events.add(Phaser.Timer.SECOND, this.comeback, this);
+    game.time.events.add(Phaser.Timer.SECOND * 5, this.comeback, this);
 };
 
 Star.prototype.comeback = function() {
