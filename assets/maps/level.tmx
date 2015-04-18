@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="36" tilewidth="16" tileheight="16" nextobjectid="1">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16">
+  <image source="../tileset.png" width="96" height="16"/>
+ </tileset>
+ <layer name="Platforms" width="50" height="36">
+  <data encoding="base64" compression="zlib">
+   eJzt01EKABAURFEh+18yG8DXSzinZgNTNyUAAFjLY+WS1aAPYObnPtpm8HMfL9F5DH0AACd152ICaw==
+  </data>
+ </layer>
+ <layer name="Ladders" width="50" height="36">
+  <data encoding="base64" compression="zlib">
+   eJztz7EJACAUQ8HfuP/KjmAaI8hd/wiZAQCAs1Xsbm750WnSzo9Ok3Z+dJq086PTpJ0fnSbtfvkBAPDKBpI0APE=
+  </data>
+ </layer>
+</map>
