@@ -6,6 +6,7 @@ var ladderMap;
 var platforms;
 var ladders;
 var stoppers;
+var stars;
 var npcs;
 var rc;
 var spaceKey;
@@ -14,6 +15,7 @@ var greg;
 function preload() {
     // preload content
     game.load.image('tilesheet', 'assets/tileset.png');
+    game.load.image('star', 'assets/star.png');
     game.load.image('player', 'assets/player.png');
     game.load.spritesheet('NPC', 'assets/NPC.png', 10, 16);
     game.load.tilemap('map', 'assets/maps/level.json', null, Phaser.Tilemap.TILED_JSON);
@@ -58,6 +60,26 @@ function create() {
          }
     }
 
+    stars = game.add.group();
+    i = 0;
+    npcs.forEach(function(npc) {
+        if (i % 2 === 0) {
+            i++;
+            return;
+        }
+
+        var star = new Star();
+        var modX = Math.random() * 50;
+        if (Math.random() > 0.5) {
+            modX *= -1;
+        }
+        star.x = npc.x + modX;
+        star.y = npc.y;
+
+        stars.add(star);
+        i++;
+    });
+
     player = new Player();
     game.add.existing(player);
     game.camera.follow(player);
@@ -69,6 +91,9 @@ function create() {
 function update() {
     game.physics.arcade.collide(player, platforms); 
     game.physics.arcade.collide(npcs, platforms); 
+    game.physics.arcade.collide(stars, platforms);
+
+    game.physics.arcade.overlap(player, stars, overlapPlayerStar);
 
     var total = 0;
     npcs.forEach(function(npc) {
@@ -120,6 +145,11 @@ function playerNPCOverlap(player, npc) {
     }
 
     npc.anger = 0;
+}
+
+function overlapPlayerStar(player, star) {
+    console.log("overlapping");
+    star.use();
 }
 
 Player = function() {
@@ -221,7 +251,6 @@ NPC.prototype.rageAt = function(otherNPC) {
     }
 
     otherNPC.anger *= 1.5;
-    console.log("RAAAGE");
     this.lastRaged = otherNPC.lastRaged = this.game.time.now;
 };
 
@@ -238,3 +267,26 @@ RageCounter.prototype.update = function() {
     this.text = "RAGE LEVEL: " + Math.round(this.level);
 };
 
+Star = function() {
+    Phaser.Sprite.call(this, game, 0, 0, 'star');
+    game.physics.arcade.enable(this);
+    this.body.gravity.y = 0;
+};
+
+Star.prototype = Object.create(Phaser.Sprite.prototype);
+Star.prototype.contstructor = Star;
+
+Star.prototype.use = function() {
+    this.exists = false;
+    game.time.events.add(Phaser.Timer.SECOND, this.comeback, this);
+};
+
+Star.prototype.comeback = function() {
+    var modX = Math.random() * 50;
+    if (Math.random() > 0.5) {
+        modX *= -1;
+    }
+
+    this.x += modX;
+    this.exists = true;
+};
