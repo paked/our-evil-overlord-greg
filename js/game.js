@@ -2,6 +2,7 @@ var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', {preload: preload, creat
 
 var player;
 var map;
+var ladderMap;
 var platforms;
 var ladders;
 
@@ -17,7 +18,7 @@ function create() {
     game.stage.backgroundColor = '#47A3FF'; 
     game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 1920, 1920);
-    game.physics.arcade.gravity.y = 400;
+    game.physics.arcade.gravity.y = 600;
 
     var text = game.add.text(32, 32, 'GREG IS HAPPY', {fontSize:'64px', fill: '#000'});
     text.anchor.set(0.5);
@@ -26,9 +27,8 @@ function create() {
 
     map = game.add.tilemap('map');
     map.addTilesetImage('tileset', 'tilesheet');
-    map.setCollisionBetween(1, 3);
-
-    platforms = map.createLayer('Platforms');
+    map.setCollisionBetween(1, 7);
+    platforms = map.createLayer('Platforms'); 
     ladders = map.createLayer('Ladders');
 
     player = new Player();
@@ -39,8 +39,7 @@ function create() {
 }
 
 function update() {
-    game.physics.arcade.collide(player, platforms);
-    // update sprites
+    game.physics.arcade.collide(player, platforms); 
 }
 
 Player = function() {
@@ -57,5 +56,10 @@ Player.prototype.update = function() {
         this.body.velocity.x = -350;
     }else if (cursors.right.isDown) {
         this.body.velocity.x = 350;
+    } 
+
+    if (cursors.up.isDown && this.body.onFloor()) {
+        this.body.velocity.y = -300;
     }
 };
+
