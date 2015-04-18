@@ -82,17 +82,22 @@ function npcOverlap(npc1, npc2) {
     if (npc1.renderOrderID == npc2.renderOrderID) {
         return;
     }
-    
-    if (Math.random() <= 0.9) {
-        return;
-    }
-
+    var rager;
+    var victim;
     if (Math.random() <= 0.5) {
-        npc1.rageAt(npc2);
-        return;
+        rager = npc1;
+        victim = npc2;
+    } else {
+        rager = npc2;
+        victim = npc1;
     }
-    
-    npc2.rageAt(npc1);
+    // higher anger, higher chance of rage
+    // 1 - 0.9 / 7
+    var chance = (rager.anger * 0.05);
+    console.log(chance, "<- chance");
+    if (Math.random() >= chance) {
+        rager.rageAt(victim);
+    }
 }
 
 Player = function() {
@@ -139,7 +144,6 @@ NPC.prototype.update = function() {
 
     this.frame = Math.round(this.anger);
     if (Math.round(this.anger) > 9) {
-        console.log("reset frame");
         this.frame = 9;
     }
 
